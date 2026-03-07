@@ -1,0 +1,40 @@
+{
+  "smartbox": {
+    "buzzer": {
+      "enabled": true
+    },
+    "camera": {
+      "captureCommand": false
+    },
+    "device": {
+      "deviceId": "BOX001",
+      "firmwareVersion": "1.0.0",
+      "lastOnline": 0,
+      "status": "online"
+    },
+    "door": {
+      "lastOpenedTime": 0,
+      "status": "closed"
+    },
+    "lock": {
+      "command": "toggle",
+      "status": false
+    },
+    "logs": {
+      "event_001": {
+        "timestamp": 0,
+        "type": "parcel_added"
+      }
+    },
+    "parcel": {
+      "count": 0,
+      "lastDetectedTime": 0
+    },
+    "weight": {
+      "lastUpdated": 0,
+      "maxLimitKg": 20,
+      "overLimit": false,
+      "totalKg": 0
+    }
+  }
+}
