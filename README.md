@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
   # Login and Register Page
 
@@ -9,3 +10,6 @@
 
   Run `npm run dev` to start the development server.
   
+=======
+# IOT_PR
+>>>>>>> 08c3b9db6ee3c7fd6620ed530171cd214d55f73b
