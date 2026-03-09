@@ -77,8 +77,10 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check both Firebase auth and localStorage auth
     onAuthStateChanged(auth, (user) => {
-      if (!user) {
+      const currentUser = localStorage.getItem("currentUser");
+      if (!user && !currentUser) {
         navigate("/");
       }
     });
@@ -109,6 +111,7 @@ const DashboardPage: React.FC = () => {
 
   const handleLogout = async () => {
     try {
+      localStorage.removeItem("currentUser");
       await signOut(auth);
       navigate("/");
     } catch (err) {
