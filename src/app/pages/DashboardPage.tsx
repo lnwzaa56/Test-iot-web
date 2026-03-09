@@ -341,7 +341,7 @@ const DashboardPage: React.FC = () => {
                 <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                   <div 
                     className={`h-2.5 rounded-full ${smartBoxData.weight.overLimit ? 'bg-red-500' : 'bg-blue-600'}`} 
-                    style={{ width: `${Math.min((smartBoxData.weight.totalKg / maxLimit) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((smartBoxData.weight.totalKg / maxLimit) * 20, 20)}%` }}
                   ></div>
                 </div>
                 
@@ -357,7 +357,7 @@ const DashboardPage: React.FC = () => {
                   <Slider
                     value={[maxLimit]}
                     onValueChange={handleMaxLimitChange}
-                    max={100}
+                    max={20}
                     min={1}
                     step={1}
                     className="w-full"
