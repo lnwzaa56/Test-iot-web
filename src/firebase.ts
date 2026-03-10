@@ -4,14 +4,14 @@ import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.AIzaSyDUBrzYarm-kq7x5r-En6VmZWk3Ia4qEcE,
-  authDomain: import.meta.env.smart-package-guard.firebaseapp.com,
-  databaseURL: import.meta.env.https://smart-package-guard-default-rtdb.asia-southeast1.firebasedatabase.app,
-  projectId: import.meta.env.smart-package-guard,
-  storageBucket: import.meta.env.smart-package-guard.firebasestorage.app,
-  messagingSenderId: import.meta.env.43272222868,
-  appId: import.meta.env.1:43272222868:web:81507444ce90aaf0525c81,
-  measurementId: import.meta.env.G-X5T8MYQEDY,
+  apiKey: "AIzaSyDUBrzYarm-kq7x5r-En6VmZWk3Ia4qEcE",
+  authDomain: "smart-package-guard.firebaseapp.com",
+  databaseURL: "https://smart-package-guard-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smart-package-guard",
+  storageBucket: "smart-package-guard.firebasestorage.app",
+  messagingSenderId:"43272222868",
+  appId:"1:43272222868:web:81507444ce90aaf0525c81",
+  measurementId: "G-X5T8MYQEDY",
 };
 
 const app = initializeApp(firebaseConfig);
