@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ref, onValue, set, update } from "firebase/database";
+import { ref, onValue, set, update, push } from "firebase/database";
 import { db } from "../../firebase";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase";
@@ -19,7 +19,9 @@ import {
   WifiOff,
   LogOut,
   Box,
-  Settings
+  Settings,
+  History,
+  Image as ImageIcon
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
@@ -32,6 +34,8 @@ interface SmartBoxData {
   };
   camera: {
     captureCommand: boolean;
+    latest_imageUrl: string;
+    triggerID: number;
   };
   device: {
     deviceId: string;
@@ -78,7 +82,7 @@ const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     // Check both Firebase auth and localStorage auth
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, (user: any) => {
       const currentUser = localStorage.getItem("currentUser");
       if (!user && !currentUser) {
         navigate("/");
@@ -88,7 +92,7 @@ const DashboardPage: React.FC = () => {
     const smartboxRef = ref(db, "smartbox");
     const unsubscribe = onValue(
       smartboxRef,
-      (snapshot) => {
+      (snapshot: any) => {
         const data = snapshot.val();
         if (data) {
           setSmartBoxData(data);
@@ -99,7 +103,7 @@ const DashboardPage: React.FC = () => {
         }
         setLoading(false);
       },
-      (err) => {
+      (err: any) => {
         console.error("Error fetching smartbox data:", err);
         setError("Failed to load smartbox data.");
         setLoading(false);
@@ -108,6 +112,23 @@ const DashboardPage: React.FC = () => {
 
     return () => unsubscribe();
   }, [navigate]);
+
+  // Effect to log the image when it changes
+  useEffect(() => {
+    if (smartBoxData?.camera?.latest_imageUrl) {
+      const lastLoggedImg = localStorage.getItem("lastLoggedImage");
+      if (lastLoggedImg !== smartBoxData.camera.latest_imageUrl) {
+        // Push to history
+        const historyRef = ref(db, "smartbox/camera_history");
+        push(historyRef, {
+          imageUrl: smartBoxData.camera.latest_imageUrl,
+          timestamp: Date.now()
+        }).then(() => {
+          localStorage.setItem("lastLoggedImage", smartBoxData.camera.latest_imageUrl);
+        }).catch(err => console.error("Failed to log image:", err));
+      }
+    }
+  }, [smartBoxData?.camera?.latest_imageUrl]);
 
   const handleLogout = async () => {
     try {
@@ -128,7 +149,7 @@ const DashboardPage: React.FC = () => {
         status: newStatus,
         command: "toggle"
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to toggle lock:", err);
     }
     setLockLoading(false);
@@ -233,6 +254,10 @@ const DashboardPage: React.FC = () => {
                 {isOnline ? 'Online' : 'Offline'}
               </span>
             </div>
+            <Button variant="outline" size="sm" onClick={() => navigate("/history")} className="hidden md:flex">
+              <History className="h-4 w-4 mr-2" />
+              History
+            </Button>
             <Button variant="outline" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
               Logout
@@ -405,19 +430,38 @@ const DashboardPage: React.FC = () => {
           </Card>
 
           {/* Camera Card */}
-          <Card className="bg-white dark:bg-gray-800 shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center">
+          <Card className="bg-white dark:bg-gray-800 shadow-md md:col-span-2 lg:col-span-1">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium flex items-center">
                 <Camera className="h-5 w-5 mr-2 text-indigo-500" />
-                Camera
+                Latest Capture
               </CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/history")}>
+                View All
+              </Button>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-500">Capture Command</span>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${smartBoxData.camera.captureCommand ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>
-                  {smartBoxData.camera.captureCommand ? 'Active' : 'Inactive'}
-                </span>
+              <div className="space-y-4">
+                <div className="aspect-video relative rounded-lg overflow-hidden bg-gray-100 border">
+                  {smartBoxData.camera.latest_imageUrl ? (
+                    <img 
+                      src={smartBoxData.camera.latest_imageUrl} 
+                      alt="Latest capture" 
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                      <ImageIcon className="h-12 w-12 mb-2" />
+                      <p className="text-sm">No image available</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Capture Command</span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${smartBoxData.camera.captureCommand ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>
+                    {smartBoxData.camera.captureCommand ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>
